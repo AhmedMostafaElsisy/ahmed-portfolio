@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Ahmed Vault</title>
+<meta name="description" content="Ahmed Mostafa builds secure apps. His portfolio is classified. Pass verification to read it." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+  /* Dark-only on purpose (vault interior). Radius rule: panels 12px, buttons full pill, dossier paper 4px. */
+  :root {
+    --bg: #0c0d0f; --steel: #17191d; --steel-2: #1f2227; --line: #2c3037; --ink: #eceae4; --muted: #9a9890;
+    --accent: #f2b632; --accent-ink: #1a1405; --ok: #6fd39a; --err: #ff6b5e;
+    --paper: #efece4; --paper-ink: #1b1a17; --paper-muted: #5f5b52;
+    --display: "Archivo", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; --stencil: "Big Shoulders Stencil Display", var(--display);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--display); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; padding: 14px 22px; cursor: pointer; white-space: nowrap;
+    font: 700 15px var(--display); font-stretch: 110%; background: var(--accent); color: var(--accent-ink); text-decoration: none; transition: transform .2s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(1px) scale(.98); }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+  .link { background: none; border: 0; color: var(--muted); font: 500 14px var(--mono); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; padding: 0; }
+  .link:hover { color: var(--accent); }
+
+  header .bar { display: flex; justify-content: space-between; align-items: center; height: 66px; font: 500 13px var(--mono); color: var(--muted); }
+  header b { font: 800 18px var(--display); font-stretch: 125%; color: var(--ink); letter-spacing: -0.01em; }
+  .status-pill { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  .status-pill i { color: var(--err); }
+  body.open .status-pill i { color: var(--ok); }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; min-height: calc(100dvh - 66px); padding: 20px 0 60px; }
+  .hero h1 { font-size: clamp(2.6rem, 5.6vw, 4.8rem); font-weight: 900; font-stretch: 118%; line-height: .98; letter-spacing: -0.035em; margin: 0; }
+  .hero h1 span { color: var(--accent); }
+  .hero .sub { color: var(--muted); font-size: 18px; line-height: 1.55; max-width: 48ch; margin: 20px 0 30px; }
+  .hero .ctas { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+
+  /* Vault door: plain geometric circles */
+  .vault-col { position: relative; display: grid; place-items: center; }
+  .door-frame { position: relative; width: min(460px, 86vw); aspect-ratio: 1; border-radius: 50%; padding: 6%;
+    background: radial-gradient(circle at 35% 30%, #2f333a, #121417 70%); box-shadow: inset 0 0 0 2px #3a3f47, 0 40px 90px -30px rgb(0 0 0 / .9); }
+  .door { position: relative; width: 100%; height: 100%; border-radius: 50%; transform-origin: 0% 50%;
+    background: radial-gradient(circle at 40% 35%, #3d424a, #1d2025 72%); box-shadow: inset 0 0 0 10px #262a30, inset 0 0 0 12px #454a53, 0 10px 30px rgb(0 0 0 / .6);
+    transition: transform 1.6s cubic-bezier(.6,0,.2,1) .9s; display: grid; place-items: center; }
+  body.open .door { transform: perspective(1200px) rotateY(-100deg); }
+  .bolts { position: absolute; inset: 7%; border-radius: 50%; }
+  .bolts i { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #5a606a; box-shadow: inset 0 -2px 0 #2b2f35; left: calc(50% - 7px); top: calc(50% - 7px); }
+  .wheel { position: relative; width: 46%; aspect-ratio: 1; border-radius: 50%; transition: transform 1.2s cubic-bezier(.6,0,.2,1); }
+  body.open .wheel { transform: rotate(540deg); }
+  .wheel .hub { position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f6cd63, #b9861a); box-shadow: 0 4px 10px rgb(0 0 0 / .6); }
+  .wheel .spoke { position: absolute; left: 50%; top: 50%; width: 100%; height: 12px; margin: -6px 0 0 -50%; border-radius: 99px;
+    background: linear-gradient(#5d636d, #343840); }
+  .wheel .spoke:nth-child(2) { transform: rotate(60deg); } .wheel .spoke:nth-child(3) { transform: rotate(120deg); }
+  .lock-led { position: absolute; top: 18%; left: 50%; transform: translateX(-50%); font: 600 11px var(--mono); color: var(--err); letter-spacing: .14em;
+    background: #0b0c0e; border: 1px solid #2a2e34; border-radius: 6px; padding: 4px 10px; }
+  body.open .lock-led { color: var(--ok); }
+  .inside { position: absolute; inset: 6%; border-radius: 50%; background: radial-gradient(circle, #2a2210, #0d0c0a 70%); display: grid; place-content: center; text-align: center; z-index: -1; }
+  .inside i { font-size: 64px; color: var(--accent); }
+  .inside small { font: 500 13px var(--mono); color: var(--muted); }
+
+  /* Verification modal */
+  .modal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; background: rgb(5 5 6 / .78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 16px; }
+  .modal.on { display: grid; }
+  .panel { width: min(460px, 100%); background: var(--steel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; animation: up .4s cubic-bezier(.2,.9,.2,1); }
+  @keyframes up { from { opacity: 0; transform: translateY(20px); } }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); font: 500 12px var(--mono); color: var(--muted); }
+  .steps { display: flex; gap: 6px; }
+  .steps span { width: 26px; height: 4px; border-radius: 99px; background: var(--line); }
+  .steps span.done { background: var(--accent); }
+  .panel-body { padding: 22px 20px; }
+  .panel-body h3 { margin: 0 0 6px; font-size: 22px; font-stretch: 110%; letter-spacing: -0.02em; }
+  .panel-body p { margin: 0 0 18px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tile { aspect-ratio: 1; border: 2px solid transparent; background: var(--steel-2); border-radius: 6px; display: grid; place-items: center; font-size: 38px; color: var(--ink); cursor: pointer; transition: transform .15s, border-color .15s; }
+  .tile[aria-pressed="true"] { border-color: var(--accent); transform: scale(.92); color: var(--accent); }
+  .panel-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--line); }
+  .verdict { font: 500 13px var(--mono); color: var(--accent); min-height: 20px; }
+  .print { display: grid; justify-items: center; gap: 14px; padding: 8px 0 4px; }
+  .fp { position: relative; width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; cursor: pointer; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; background: var(--steel-2); }
+  .fp i { font-size: 72px; color: var(--muted); position: relative; z-index: 1; }
+  .fp .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0%; background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .fp.done { border-color: var(--ok); } .fp.done i { color: var(--ok); }
+  .answers { display: grid; gap: 8px; }
+  .answers button { text-align: left; border: 1.5px solid var(--line); background: var(--steel-2); color: var(--ink); border-radius: 10px; padding: 12px 14px; font: 500 15px var(--display); cursor: pointer; }
+  .answers button:hover { border-color: var(--muted); }
+  .answers button.wrong { border-color: var(--err); animation: shake .4s; }
+  .answers button.right { border-color: var(--ok); }
+  @keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+  /* Dossier */
+  section { padding: 96px 0; }
+  .dossier { position: relative; background: var(--paper); color: var(--paper-ink); border-radius: 4px; padding: 56px 56px 48px;
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / .9); }
+  .dossier::before { content: ""; position: absolute; top: -18px; left: 48px; width: 180px; height: 22px; background: var(--paper); border-radius: 6px 6px 0 0; }
+  .stamp { position: absolute; top: 40px; right: 48px; transform: rotate(-9deg); font: 800 38px var(--stencil); letter-spacing: .06em; color: #b3261e;
+    border: 4px solid #b3261e; padding: 2px 14px; border-radius: 6px; opacity: .85; transition: opacity .6s; }
+  body.open .stamp { color: #1f7a4d; border-color: #1f7a4d; }
+  .d-head { display: grid; grid-template-columns: 150px 1fr; gap: 30px; align-items: start; border-bottom: 2px solid var(--paper-ink); padding-bottom: 30px; }
+  .photo { position: relative; aspect-ratio: 3/4; overflow: hidden; border-radius: 3px; background: #c9c4b7; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.15); transition: filter 1s; }
+  body.open .photo img { filter: grayscale(.2) contrast(1.05); }
+  .photo::after { content: ""; position: absolute; left: 0; right: 0; height: 30%; background: linear-gradient(transparent, rgb(242 182 50 / .35), transparent); animation: scan 3s ease-in-out infinite; }
+  @keyframes scan { 0% { top: -30%; } 100% { top: 100%; } }
+  .d-head small, .field small { display: block; font: 600 11px var(--mono); color: var(--paper-muted); letter-spacing: .08em; margin-bottom: 4px; }
+  .d-head h2 { font-size: clamp(2rem, 4.2vw, 3.4rem); font-weight: 900; font-stretch: 120%; letter-spacing: -0.03em; margin: 0 0 18px; line-height: 1; }
+  .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; }
+  .field p { margin: 0; font-size: 15.5px; line-height: 1.45; }
+  .d-sec { padding-top: 34px; }
+  .d-sec h3 { font: 600 13px var(--mono); letter-spacing: .1em; margin: 0 0 16px; color: var(--paper-muted); }
+  .summary { font-size: 19px; line-height: 1.65; max-width: 70ch; margin: 0; }
+
+  .missions { display: grid; gap: 0; }
+  .mission { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 18px 0; border-top: 1px dashed #b9b3a5; }
+  .mission .when { font: 500 13px var(--mono); color: var(--paper-muted); }
+  .mission b { font-size: 18px; font-stretch: 110%; }
+  .mission ul { margin: 8px 0 0; padding-left: 18px; line-height: 1.55; font-size: 15px; }
+
+  .assets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .asset { grid-column: span 2; border: 1.5px solid var(--paper-ink); border-radius: 4px; padding: 18px; display: flex; flex-direction: column; gap: 6px; background: #f6f4ee; }
+  .asset.lead { grid-column: span 4; background: var(--paper-ink); color: var(--paper); }
+  .asset.lead .code, .asset.lead p { color: #cfcabd; }
+  .asset.half { grid-column: span 3; }
+  .asset .code { font: 600 11px var(--mono); color: var(--paper-muted); letter-spacing: .08em; }
+  .asset b { font-size: 20px; font-stretch: 112%; }
+  .asset p { margin: 0; font-size: 14.5px; line-height: 1.45; color: #3a3832; }
+  .asset a { font: 600 13px var(--mono); color: var(--accent); margin-top: auto; }
+
+  .medals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .medal { border-top: 4px solid var(--paper-ink); padding-top: 12px; }
+  .medal b { display: block; font-size: 20px; font-stretch: 112%; }
+  .medal span { font-size: 14px; color: var(--paper-muted); }
+
+  /* Redaction */
+  /* Background bar instead of an overlay so it follows every wrapped line. Text is near-black on the bar. */
+  .red { background-image: linear-gradient(#141311, #141311); background-repeat: no-repeat; background-position: right center; background-size: 100% 100%;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+    transition: background-size .8s cubic-bezier(.7,0,.2,1); transition-delay: var(--d, 0s); }
+  body.open .red { background-size: 0% 100%; }
+  .asset.lead .red { background-image: linear-gradient(#cfcabd, #cfcabd); }
+
+  .channel { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .channel small { font: 500 13px var(--mono); color: var(--paper-muted); flex-basis: 100%; }
+  .dossier .btn.ghost { color: var(--paper-ink); box-shadow: inset 0 0 0 1.5px var(--paper-ink); }
+
+  footer { padding: 10px 0 44px; color: var(--muted); font: 13px var(--mono); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; min-height: 0; }
+    .vault-col { order: -1; }
+    .door-frame { width: min(300px, 76vw); }
+    .dossier { padding: 40px 22px 32px; }
+    .stamp { position: static; display: inline-block; margin-bottom: 18px; font-size: 28px; }
+    .d-head { grid-template-columns: 1fr; }
+    .photo { width: 140px; }
+    .fields { grid-template-columns: 1fr 1fr; }
+    .mission { grid-template-columns: 1fr; gap: 4px; }
+    .assets { grid-template-columns: 1fr; }
+    .asset, .asset.lead, .asset.half { grid-column: auto; }
+    .medals { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) { .wrap { padding: 0 16px; } .fields { grid-template-columns: 1fr; } header .status-pill span { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap bar"><b>THE AHMED VAULT</b><span class="status-pill"><i class="ph-fill ph-lock-simple" id="pillIc"></i><span id="pillText">Clearance: none</span></span></div></header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>This portfolio is <span>encrypted.</span></h1>
+      <p class="sub">I build secure apps for a living, so of course my portfolio is locked. Pass a quick identity check to read the file.</p>
+      <div class="ctas">
+        <button class="btn" id="start"><i class="ph-bold ph-fingerprint"></i>Start verification</button>
+        <button class="link" id="fast">Recruiter fast lane</button>
+      </div>
+    </div>
+    <div class="vault-col">
+      <div class="door-frame">
+        <div class="inside"><div><i class="ph-duotone ph-folder-lock"></i><br/><small>FILE: A. MOSTAFA</small></div></div>
+        <div class="door">
+          <div class="bolts" id="bolts"></div>
+          <div class="lock-led" id="led">LOCKED</div>
+          <div class="wheel"><span class="spoke"></span><span class="spoke"></span><span class="spoke"></span><span class="hub"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="file">
+    <div class="wrap">
+      <article class="dossier">
+        <div class="stamp" id="stamp">TOP SECRET</div>
+        <div class="d-head">
+          <div class="photo"><img id="photo" alt="Ahmed Mostafa" /></div>
+          <div>
+            <small>SUBJECT</small>
+            <h2>Ahmed Mostafa</h2>
+            <div class="fields" id="fields"></div>
+          </div>
+        </div>
+
+        <div class="d-sec">
+          <h3>SUMMARY</h3>
+          <p class="summary" id="summary"></p>
+        </div>
+        <div class="d-sec">
+          <h3>KNOWN MISSIONS</h3>
+          <div class="missions" id="missions"></div>
+        </div>
+        <div class="d-sec">
+          <h3>ASSETS BUILT</h3>
+          <div class="assets" id="assets"></div>
+          <p style="font:500 13px var(--mono);color:var(--paper-muted);margin:14px 0 0" id="more"></p>
+        </div>
+        <div class="d-sec">
+          <h3>COMMENDATIONS</h3>
+          <div class="medals" id="medals"></div>
+        </div>
+        <div class="channel">
+          <small>SECURE CHANNEL</small>
+          <a class="btn" id="mail"><i class="ph-bold ph-envelope-simple"></i>Email Ahmed</a>
+          <a class="btn ghost" id="li" target="_blank" rel="noopener"><i class="ph ph-linkedin-logo"></i>LinkedIn</a>
+          <a class="btn ghost" id="gh" target="_blank" rel="noopener"><i class="ph ph-github-logo"></i>GitHub</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>No tokens were stored in SharedPreferences while building this page.</span><span>&copy; <span id="year"></span> Ahmed Mostafa</span></div></footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="qTitle">
+  <div class="panel">
+    <div class="panel-head"><span id="stepLabel">CHECK 1 OF 3</span><span class="steps" id="steps"><span></span><span></span><span></span></span></div>
+    <div class="panel-body" id="pbody"></div>
+    <div class="panel-foot"><span class="verdict" id="verdict"></span><span id="pnext"></span></div>
+  </div>
+</div>
+
+<script src="../shared/data.js"></script>
+<script>
+(() => {
+  const A = window.AHMED;
+  const $ = (s) => document.querySelector(s);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  $("#year").textContent = new Date().getFullYear();
+  $("#photo").src = A.avatar;
+  $("#mail").href = A.links.email; $("#li").href = A.links.linkedin; $("#gh").href = A.links.github;
+
+  // Door bolts
+  $("#bolts").innerHTML = Array.from({ length: 12 }, (_, i) => `<i style="transform:rotate(${i * 30}deg) translateY(calc(-1 * min(195px, 36vw) * .92))"></i>`).join("");
+
+  // Redaction helper: wraps text in a span that gets declassified later
+  let d = 0;
+  const R = (t) => `<span class="red" style="--d:${(d++ % 14) * 0.07}s">${t}</span>`;
+
+  $("#fields").innerHTML = [
+    ["ROLE", R(A.title)], ["BASE", R(A.location)], ["ACTIVE SINCE", R("Oct 2021")],
+    ["CURRENT POST", R("Iden2 (remote)")], ["SIDE OPERATION", R("Founder, Mudawy")], ["SPECIALTY", R("Mobile security")],
+  ].map(([k, v]) => `<div class="field"><small>${k}</small><p>${v}</p></div>`).join("");
+
+  $("#summary").innerHTML = `Subject has spent ${R("4+ years")} building ${R("cross-platform Flutter apps")} and has shipped ${R("15+ of them")}. ` +
+    `Known for ${R("locking down sensitive data")}, ${R("taking test coverage from 0% to 80%+")} and ${R("automating releases until they're boring")}. ` +
+    `Also runs ${R("Mudawy, a clinic product with its own NestJS and PostgreSQL backend")}. Considered ${R("friendly and highly hireable")}.`;
+
+  $("#missions").innerHTML = A.experience.map(x => `
+    <div class="mission">
+      <div class="when">${x.period}<br/>${x.where}</div>
+      <div><b>${x.role}, ${x.company}</b><ul>${x.wins.map(w => `<li>${R(w)}</li>`).join("")}</ul></div>
+    </div>`).join("");
+
+  const codes = { mudawy: "OPERATION OFFLINE CLINIC", iden2: "OPERATION LOCKBOX", kwealth: "OPERATION TICKER", nuwas: "OPERATION WRENCH",
+    kera: "OPERATION HOUSE KEYS", himma: "OPERATION GAINS", eowl: "OPERATION NIGHT OWL" };
+  // 6-col grid: lead(4)+1(2) | 3 x (2) | 2 x (3)  = exactly 7 cells, no gaps
+  const cls = ["lead", "", "", "", "", "half", "half"];
+  $("#assets").innerHTML = A.projects.map((p, i) => `
+    <div class="asset ${cls[i]}">
+      <span class="code">${codes[p.id]}</span>
+      <b>${p.name}</b>
+      <p>${R(p.oneLiner)}</p>
+      ${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">mudawy.com &rarr;</a>` : ""}
+    </div>`).join("");
+  $("#more").innerHTML = `Other assets: ${R(A.moreApps.join(", "))}`;
+
+  $("#medals").innerHTML = A.achievements.map(a => `<div class="medal"><b>${a.title}</b><span>${a.by}</span></div>`).join("");
+
+  // Open the vault
+  function grant(fast) {
+    $("#modal").classList.remove("on");
+    document.body.classList.add("open");
+    $("#led").textContent = "ACCESS GRANTED";
+    $("#stamp").textContent = "DECLASSIFIED";
+    $("#pillIc").className = "ph-fill ph-lock-simple-open";
+    $("#pillText").textContent = fast ? "Clearance: recruiter" : "Clearance: verified human";
+    $("#start").innerHTML = '<i class="ph-bold ph-folder-open"></i>Read the file';
+    $("#start").onclick = () => $("#file").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    $("#fast").hidden = true;
+    setTimeout(() => $("#file").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }), reduce ? 0 : 2600);
+  }
+  $("#fast").addEventListener("click", () => grant(true));
+
+  // Verification checks
+  let step = 0;
+  const setStep = (i) => {
+    step = i;
+    $("#stepLabel").textContent = `CHECK ${i + 1} OF 3`;
+    $("#steps").querySelectorAll("span").forEach((s, j) => s.classList.toggle("done", j < i));
+    $("#verdict").textContent = ""; $("#pnext").innerHTML = "";
+    [checkDeadlines, checkPrint, checkQuestion][i]();
+  };
+  const next = (label = "Next") => {
+    $("#pnext").innerHTML = `<button class="btn" id="nextBtn">${label}<i class="ph-bold ph-arrow-right"></i></button>`;
+    $("#nextBtn").addEventListener("click", () => step < 2 ? setStep(step + 1) : grant(false));
+    $("#nextBtn").focus();
+  };
+
+  function checkDeadlines() {
+    const icons = ["ph-calendar-x", "ph-coffee", "ph-calendar-x", "ph-bug", "ph-pizza", "ph-calendar-x", "ph-cat", "ph-calendar-x", "ph-rocket"];
+    $("#pbody").innerHTML = `<h3 id="qTitle">Select all squares with a deadline</h3><p>Standard human check. Robots don't fear deadlines.</p>
+      <div class="tiles">${icons.map((ic, i) => `<button class="tile" aria-pressed="false" data-dl="${ic === "ph-calendar-x"}" aria-label="${ic.replace("ph-", "")}"><i class="ph-duotone ${ic}"></i></button>`).join("")}</div>`;
+    const tiles = [...document.querySelectorAll(".tile")];
+    tiles.forEach(t => t.addEventListener("click", () => {
+      t.setAttribute("aria-pressed", t.getAttribute("aria-pressed") !== "true");
+      const picked = tiles.filter(x => x.getAttribute("aria-pressed") === "true");
+      if (!picked.length) { $("#verdict").textContent = ""; $("#pnext").innerHTML = ""; return; }
+      const allDl = tiles.filter(x => x.dataset.dl === "true").every(x => x.getAttribute("aria-pressed") === "true");
+      const onlyDl = picked.every(x => x.dataset.dl === "true");
+      $("#verdict").textContent = allDl && onlyDl ? "Perfect. You'd make a great PM." : picked.some(x => x.querySelector(".ph-bug")) ? "A bug? Fair. Bugs are deadlines too." : "Close enough. Deadlines are everywhere.";
+      next();
+    }));
+  }
+
+  function checkPrint() {
+    $("#pbody").innerHTML = `<h3 id="qTitle">Biometric scan</h3><p>Press and hold the sensor until it's full.</p>
+      <div class="print"><div class="fp" id="fp" role="button" tabindex="0" aria-label="Fingerprint sensor, press and hold"><div class="fill" id="fill"></div><i class="ph ph-fingerprint"></i></div></div>`;
+    const fp = $("#fp"), fill = $("#fill");
+    let p = 0, timer = null, done = false;
+    const tick = () => {
+      p = Math.min(100, p + (reduce ? 100 : 4)); fill.style.height = p + "%";
+      if (p >= 100) { stop(); done = true; fp.classList.add("done"); $("#verdict").textContent = "Match: 'person who reads portfolios'"; next(); }
+    };
+    const startHold = (e) => { if (done) return; e.preventDefault(); clearInterval(timer); timer = setInterval(tick, 40); };
+    const stop = () => {
+      const wasHolding = timer !== null;
+      clearInterval(timer); timer = null;
+      if (wasHolding && !done) { p = 0; fill.style.height = "0%"; $("#verdict").textContent = "Keep holding. Patience is part of the check."; }
+    };
+    fp.addEventListener("pointerdown", startHold);
+    ["pointerup", "pointerleave", "pointercancel"].forEach(ev => fp.addEventListener(ev, stop));
+    fp.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !timer) startHold(e); });
+    fp.addEventListener("keyup", stop);
+  }
+
+  function checkQuestion() {
+    const opts = [
+      ["SharedPreferences", "That's where tokens go to get stolen."],
+      ["A sticky note on the monitor", "Classic. Also very wrong."],
+      ["Encrypted storage backed by Android Keystore", ""],
+      ["Tweet it, for backup", "Bold. Rejected."],
+    ];
+    $("#pbody").innerHTML = `<h3 id="qTitle">Security question</h3><p>Where should a mobile app keep an auth token?</p>
+      <div class="answers">${opts.map((o, i) => `<button data-i="${i}">${o[0]}</button>`).join("")}</div>`;
+    document.querySelectorAll(".answers button").forEach(b => b.addEventListener("click", () => {
+      const [, why] = opts[b.dataset.i];
+      if (why) { b.classList.remove("wrong"); void b.offsetWidth; b.classList.add("wrong"); $("#verdict").textContent = why; return; }
+      b.classList.add("right");
+      $("#verdict").textContent = "Correct. That's what I built at Iden2.";
+      $("#steps").querySelectorAll("span").forEach(s => s.classList.add("done"));
+      next("Open the vault");
+    }));
+  }
+
+  $("#start").onclick = () => { $("#modal").classList.add("on"); setStep(0); };
+  $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").classList.remove("on"); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#modal").classList.remove("on"); });
+})();
+</script>
+</body>
+</html>

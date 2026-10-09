@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portfolio Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #f2f2ef; --ink: #141414; --muted: #5f5f5a; --card: #fff; --line: #dcdcd6; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0e0e10; --ink: #ececea; --muted: #9a9a96; --card: #17171a; --line: #2a2a2e; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 64px 24px; }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: -0.04em; margin: 0; }
+  p.sub { color: var(--muted); margin: 12px 0 40px; font-size: 18px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  a.card { display: block; text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px; transition: transform .25s, border-color .25s; }
+  a.card:hover { transform: translateY(-3px); border-color: var(--ink); }
+  .swatch { height: 8px; border-radius: 99px; margin-bottom: 18px; }
+  h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.02em; }
+  .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pick a portfolio.</h1>
+  <p class="sub">Four working concepts for Ahmed Mostafa. Same content, very different jokes.</p>
+  <div class="grid">
+    <a class="card" href="clinic/"><div class="swatch" style="background:#0a7a5e"></div><h2>Dr. Ahmed's App Clinic</h2><p>Take a number, pick your app's symptoms, get a diagnosis and a prescription you can't read.</p></a>
+    <a class="card" href="phone/"><div class="swatch" style="background:#ff5a1f"></div><h2>AhmedOS</h2><p>The portfolio is a phone. Unlock it, open Wallet, the App Store, Settings and Messages.</p></a>
+    <a class="card" href="hot-reload/"><div class="swatch" style="background:#54c5f8"></div><h2>Hot Reload</h2><p>Press r to hot reload through his career, from the default counter app to his own product.</p></a>
+    <a class="card" href="vault/"><div class="swatch" style="background:#f2b632"></div><h2>The Ahmed Vault</h2><p>Pass a silly identity check, open the vault, and watch the dossier declassify.</p></a>
+  </div>
+</main>
+</body>
+</html>

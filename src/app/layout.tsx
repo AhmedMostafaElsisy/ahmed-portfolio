@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { DEFAULT_PALETTE, PALETTE_STORAGE_KEY, palettes } from "@/lib/palettes";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -24,21 +23,9 @@ export const viewport: Viewport = {
   ],
 };
 
-// Applies the saved palette before first paint so there is no color flash.
-const paletteScript = `(() => {
-  try {
-    const saved = localStorage.getItem(${JSON.stringify(PALETTE_STORAGE_KEY)});
-    const allowed = ${JSON.stringify(palettes.map((p) => p.id))};
-    if (saved && allowed.includes(saved)) document.documentElement.dataset.palette = saved;
-  } catch (e) {}
-})();`;
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-palette={DEFAULT_PALETTE} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
-      </head>
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
     </html>
   );

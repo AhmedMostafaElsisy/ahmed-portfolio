@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 
 // Wallet card and app-icon colors. These are "physical objects" inside the OS metaphor,
-// so they stay fixed across palettes, like real cards and app icons would.
+// so they keep their own colors instead of the brand accent, like real cards and app icons would.
 export const jobGradients = [
   "linear-gradient(140deg,#0a84ff,#0040a8)",
   "linear-gradient(140deg,#22a06b,#0d5c40)",

@@ -2,7 +2,6 @@ import { IslandToast } from "@/components/os/island-toast";
 import { OsProvider } from "@/components/os/os-context";
 import { Phone } from "@/components/os/phone";
 import { SectionSync } from "@/components/os/section-sync";
-import { PaletteSwitcher } from "@/components/palette-switcher";
 import { Hero } from "@/components/sections/hero";
 import { Messages } from "@/components/sections/messages";
 import { Mudawy } from "@/components/sections/mudawy";
@@ -17,7 +16,6 @@ export default function Home() {
     <OsProvider>
       <SectionSync />
       <IslandToast />
-      <PaletteSwitcher />
 
       {/* Desktop: phone pinned on the left spanning both rows, content on the right.
           Mobile: hero, then the phone, then the sections, in normal flow. */}
@@ -38,7 +36,7 @@ export default function Home() {
           <Settings />
           <Trophies />
           <Messages />
-          <footer className="flex flex-wrap justify-between gap-4 border-t border-line py-10 pb-24 text-sm text-muted">
+          <footer className="flex flex-wrap justify-between gap-4 border-t border-line py-10 text-sm text-muted">
             <span>Built with Next.js. No tokens were stored in plain text.</span>
             <span>&copy; {new Date().getFullYear()} Ahmed Mostafa</span>
           </footer>

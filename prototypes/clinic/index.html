@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dr. Ahmed's App Clinic</title>
+<meta name="description" content="Ahmed Mostafa, Senior Flutter Developer. Bring your sick app, leave with a healthy one." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&family=Reenie+Beanie&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+  /* Radius rule: panels 16px, buttons and chips full pill, tickets 6px. */
+  :root {
+    --bg: #eaf1ee;
+    --paper: #fafcfb;
+    --ink: #0f211c;
+    --muted: #4a5f58;
+    --line: #cbd9d3;
+    --accent: #0a7a5e;
+    --accent-soft: #d3ebe3;
+    --accent-ink: #f4fbf8;
+    --led: #0a7a5e;
+    --shadow: 0 18px 40px -18px rgb(10 60 45 / .35);
+    --r: 16px;
+    --display: "Bricolage Grotesque", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --hand: "Reenie Beanie", cursive;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1512;
+      --paper: #12201b;
+      --ink: #e4eeea;
+      --muted: #9bb1a9;
+      --line: #22362f;
+      --accent: #3cc79f;
+      --accent-soft: #173a30;
+      --accent-ink: #052119;
+      --led: #5ef0c2;
+      --shadow: 0 18px 40px -18px rgb(0 0 0 / .7);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--display); font-size: 17px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 96px 0; scroll-margin-top: 70px; }
+  h1, h2, h3 { line-height: 1.05; letter-spacing: -0.03em; margin: 0; }
+  h2 { font-size: clamp(2rem, 4.2vw, 3.2rem); font-weight: 800; }
+  .lead { color: var(--muted); max-width: 60ch; margin: 16px 0 0; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+    border: 0; border-radius: 999px; padding: 14px 22px; cursor: pointer;
+    font: 600 16px var(--display); text-decoration: none;
+    background: var(--accent); color: var(--accent-ink);
+    transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s;
+    box-shadow: 0 10px 24px -12px var(--accent);
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(1px) scale(.98); }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn i { font-size: 20px; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 24px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; text-decoration: none; }
+  .brand .cross {
+    width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    background: var(--accent); color: var(--accent-ink); font-size: 20px;
+  }
+  nav { display: flex; gap: 26px; font-weight: 500; }
+  nav a { text-decoration: none; color: var(--muted); }
+  nav a:hover { color: var(--ink); }
+  .led {
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; white-space: nowrap;
+  }
+  .led b {
+    font-size: 20px; color: var(--led); background: #07130f; padding: 2px 10px; border-radius: 6px;
+    letter-spacing: .12em; text-shadow: 0 0 8px color-mix(in srgb, var(--led) 60%, transparent);
+  }
+  .brand .short { display: none; }
+  @media (max-width: 860px) { nav { display: none; } }
+  @media (max-width: 520px) { .brand .long { display: none; } .brand .short { display: inline; } .led { font-size: 12px; } }
+
+  /* Announcements marquee (the only marquee on the page) */
+  .announce { overflow: hidden; border-bottom: 1px solid var(--line); background: var(--paper); }
+  .announce .track {
+    display: flex; gap: 48px; width: max-content; padding: 9px 0;
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+    animation: slide 40s linear infinite;
+  }
+  .announce span { display: inline-flex; gap: 10px; align-items: center; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* Hero */
+  .hero { padding: 56px 0 88px; }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.2rem); font-weight: 800; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero .lead { font-size: 19px; }
+  .hero .ctas { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  .duty {
+    display: flex; align-items: center; gap: 14px; margin-top: 40px;
+    padding: 10px 18px 10px 10px; border-radius: 999px; background: var(--paper);
+    border: 1px solid var(--line); width: fit-content;
+  }
+  .duty img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+  .duty small { display: block; color: var(--muted); font-size: 13px; }
+  .duty .on { color: var(--accent); font-weight: 700; }
+
+  /* Ticket machine */
+  .machine {
+    position: relative; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 28px; padding: 28px; box-shadow: var(--shadow);
+  }
+  .machine-head { display: flex; justify-content: space-between; align-items: center; }
+  .machine-head span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .screen {
+    margin: 18px 0; background: #07130f; color: var(--led); border-radius: 14px;
+    padding: 22px; font-family: var(--mono); text-align: center;
+  }
+  .screen small { display: block; font-size: 12px; opacity: .7; letter-spacing: .1em; }
+  .screen .num { font-size: 64px; font-weight: 600; letter-spacing: .1em; line-height: 1.1;
+    text-shadow: 0 0 18px color-mix(in srgb, var(--led) 55%, transparent); }
+  .slot { height: 10px; border-radius: 99px; background: var(--line); margin: 20px 18px 0; }
+  .ticket-zone { height: 0; overflow: visible; position: relative; }
+  .ticket {
+    position: relative; margin: -4px 30px 0; background: #fffdf6; color: #1d2421;
+    border-radius: 0 0 6px 6px; padding: 18px 20px 22px; font-family: var(--mono); font-size: 13px;
+    transform-origin: top; transform: scaleY(0); opacity: 0; display: none;
+    box-shadow: 0 14px 30px -14px rgb(0 0 0 / .35);
+    -webkit-mask: radial-gradient(circle 6px at 0 70%, transparent 98%, #000) , radial-gradient(circle 6px at 100% 70%, transparent 98%, #000);
+    -webkit-mask-composite: source-in; mask-composite: intersect;
+  }
+  .ticket.out { display: block; animation: print 0.9s cubic-bezier(.2,.9,.2,1) forwards; }
+  @keyframes print { 0% { transform: scaleY(0); opacity: 1; } 100% { transform: scaleY(1); opacity: 1; } }
+  .ticket .tn { font-size: 40px; font-weight: 600; letter-spacing: .06em; margin: 4px 0; }
+  .ticket hr { border: 0; border-top: 1px dashed #b9c2be; margin: 12px 0; }
+  .ticket a { color: #0a7a5e; font-weight: 600; }
+  .machine-spacer { transition: height .9s cubic-bezier(.2,.9,.2,1); height: 0; }
+
+  /* Triage */
+  .triage-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; margin-top: 44px; align-items: start; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+    border-radius: 999px; padding: 11px 16px; font: 500 15px var(--display); cursor: pointer;
+    display: inline-flex; gap: 8px; align-items: center; transition: all .2s;
+  }
+  .chip i { font-size: 18px; color: var(--muted); }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .chip[aria-pressed="true"] i { color: var(--accent); }
+  .chip:active { transform: scale(.97); }
+  .triage-actions { margin-top: 26px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .triage-actions small { color: var(--muted); }
+  .report {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 28px; min-height: 360px; box-shadow: var(--shadow);
+  }
+  .report-empty { height: 100%; min-height: 300px; display: grid; place-items: center; text-align: center; color: var(--muted); }
+  .report-empty i { font-size: 48px; display: block; margin-bottom: 10px; color: var(--line); }
+  .report-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap;
+    border-bottom: 1px dashed var(--line); padding-bottom: 14px; margin-bottom: 8px; }
+  .report-head h3 { font-size: 24px; }
+  .sev { font-family: var(--mono); font-size: 13px; padding: 4px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .dx { display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(10px); animation: rise .5s cubic-bezier(.16,1,.3,1) forwards; }
+  .dx:last-of-type { border-bottom: 0; }
+  .dx > i { font-size: 26px; color: var(--accent); margin-top: 2px; }
+  .dx b { display: block; }
+  .dx s { color: var(--muted); font-size: 14px; }
+  .dx p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* Medical history chart */
+  .chart { margin-top: 44px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .chart-top { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+  .vital { padding: 22px 24px; }
+  .vital + .vital { border-left: 1px solid var(--line); }
+  .vital small { color: var(--muted); font-size: 13px; display: block; }
+  .vital strong { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
+  .ecg { display: block; width: 100%; height: 90px; border-bottom: 1px solid var(--line);
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 22px 22px; background-position: -1px -1px; opacity: .9; }
+  .ecg path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round;
+    stroke-dasharray: 2600; stroke-dashoffset: 2600; }
+  .ecg.go path { animation: draw 2.6s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .visits { display: grid; }
+  .visit { display: grid; grid-template-columns: 170px 1fr; gap: 28px; padding: 26px 24px; }
+  .visit + .visit { border-top: 1px dashed var(--line); }
+  .visit .when { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .visit h3 { font-size: 21px; }
+  .visit h3 span { color: var(--accent); }
+  .visit ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--muted); font-size: 15px; }
+  .visit li { display: flex; gap: 8px; }
+  .visit li i { color: var(--accent); margin-top: 4px; }
+  .note { font-family: var(--hand); font-size: 26px; color: var(--accent); line-height: 1; margin-top: 8px; transform: rotate(-1.5deg); }
+
+  /* Case files */
+  .cases { display: grid; grid-template-columns: 300px 1fr; gap: 32px; margin-top: 44px; align-items: start; }
+  .tabs { display: grid; gap: 8px; }
+  .tab {
+    text-align: left; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+    border-radius: 12px 12px 12px 12px; padding: 14px 16px; cursor: pointer; font: 600 16px var(--display);
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all .2s;
+  }
+  .tab small { font: 400 12px var(--mono); color: var(--muted); }
+  .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); transform: translateX(8px); }
+  .tab[aria-selected="true"] small { color: var(--accent-ink); opacity: .8; }
+  .folder {
+    position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 36px; box-shadow: var(--shadow); min-height: 420px;
+  }
+  .folder::before { content: ""; position: absolute; top: -14px; left: 28px; width: 140px; height: 16px;
+    background: var(--paper); border: 1px solid var(--line); border-bottom: 0; border-radius: 10px 10px 0 0; }
+  .folder .stamp {
+    position: absolute; right: 30px; top: 28px; transform: rotate(8deg);
+    border: 3px solid var(--accent); color: var(--accent); border-radius: 10px; padding: 4px 12px;
+    font: 800 15px var(--mono); letter-spacing: .1em; opacity: .85;
+  }
+  .folder h3 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; padding-right: 130px; }
+  .folder .tagline { color: var(--muted); margin: 6px 0 26px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .field small { display: block; font: 600 12px var(--mono); color: var(--muted); margin-bottom: 4px; }
+  .field p { margin: 0; }
+  .meds { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .meds span { font: 500 13px var(--mono); padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); }
+  .folder .visit-link { margin-top: 26px; }
+  .more { margin-top: 20px; color: var(--muted); font-size: 15px; }
+  .folder.swap { animation: rise .45s cubic-bezier(.16,1,.3,1); }
+
+  /* Certificates wall */
+  .wall { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: auto auto; gap: 24px; margin-top: 44px; }
+  .cert {
+    background: var(--paper); border: 10px solid color-mix(in srgb, var(--ink) 85%, var(--accent));
+    border-radius: 6px; padding: 26px; text-align: center; box-shadow: var(--shadow);
+    transform: rotate(var(--tilt)); transition: transform .4s cubic-bezier(.16,1,.3,1);
+  }
+  .cert:hover { transform: rotate(0deg) scale(1.02); }
+  .cert:first-child { grid-row: span 2; display: grid; place-content: center; }
+  .cert:first-child strong { font-size: 44px; }
+  .cert i { font-size: 34px; color: var(--accent); }
+  .cert strong { display: block; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 8px 0 4px; }
+  .cert small { color: var(--muted); }
+  .cert .sig { font-family: var(--hand); font-size: 24px; color: var(--muted); margin-top: 12px; }
+
+  /* Prescription */
+  .rx-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  .rx {
+    background: #fdfdf8; color: #17201c; border-radius: 8px; padding: 34px 38px 30px;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / .45); transform: rotate(-1.2deg); position: relative;
+  }
+  .rx-head { display: flex; justify-content: space-between; border-bottom: 2px solid #0a7a5e; padding-bottom: 12px; }
+  .rx-head b { font-size: 20px; }
+  .rx-head small { display: block; color: #55625d; font-size: 13px; }
+  .rx-head .logo { font: 800 44px var(--display); color: #0a7a5e; line-height: 1; }
+  .rx-body { min-height: 230px; padding: 18px 0 6px; }
+  .scrawl { font-family: var(--hand); font-size: 34px; line-height: 1.05; color: #1b3a8a; transform: skewX(-12deg); letter-spacing: -2px; }
+  .clear { font-size: 18px; line-height: 1.7; }
+  .clear b { color: #0a7a5e; }
+  .rx-foot { display: flex; justify-content: space-between; align-items: end; border-top: 1px dashed #b9c2be; padding-top: 12px; font: 12px var(--mono); color: #55625d; }
+  .rx-foot .sign { font-family: var(--hand); font-size: 30px; color: #1b3a8a; }
+  .rx-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+  .contact-list { margin-top: 30px; display: grid; gap: 10px; }
+  .contact-list a { display: inline-flex; gap: 10px; align-items: center; text-decoration: none; color: var(--muted); }
+  .contact-list a:hover { color: var(--accent); }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    section { padding: 72px 0; }
+    .hero-grid, .triage-grid, .cases, .rx-wrap { grid-template-columns: 1fr; }
+    .chart-top { grid-template-columns: 1fr 1fr; }
+    .vital:nth-child(3) { border-left: 0; }
+    .vital:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .visit { grid-template-columns: 1fr; gap: 6px; }
+    .tabs { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .tab[aria-selected="true"] { transform: none; }
+    .fields { grid-template-columns: 1fr; }
+    .wall { grid-template-columns: 1fr 1fr; }
+    .cert:first-child { grid-column: span 2; grid-row: auto; }
+    .folder { padding: 28px 22px; }
+    .folder h3 { padding-right: 0; }
+    .folder .stamp { position: static; display: inline-block; margin-bottom: 12px; }
+  }
+  @media (max-width: 520px) { .wrap { padding: 0 16px; } .wall { grid-template-columns: 1fr; } .cert:first-child { grid-column: auto; } .rx { padding: 26px 22px; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    .announce .track { animation: none; }
+    .reveal { opacity: 1; transform: none; }
+  }
+
+  @media print {
+    header, .announce, .hero, #triage, #cases, #wall, .rx-actions, footer, .contact-list { display: none !important; }
+    body { background: #fff; color: #111; }
+    section { padding: 20px 0; }
+    .rx { transform: none; box-shadow: none; border: 1px solid #ccc; }
+    .scrawl { display: none; } .clear { display: block !important; }
+    .chart { box-shadow: none; } .ecg { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#top"><span class="cross"><i class="ph-bold ph-first-aid"></i></span><span class="long">Dr. Ahmed's App Clinic</span><span class="short">Dr. Ahmed</span></a>
+    <nav aria-label="Main">
+      <a href="#triage">Triage</a>
+      <a href="#history">History</a>
+      <a href="#cases">Case files</a>
+      <a href="#rx">Prescription</a>
+    </nav>
+    <div class="led" aria-live="polite">Now serving <b id="nowServing">042</b></div>
+  </div>
+</header>
+
+<div class="announce" aria-hidden="true">
+  <div class="track" id="announceTrack"></div>
+</div>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>Is your app feeling <em>sick?</em></h1>
+        <p class="lead">I'm Ahmed, a senior Flutter developer. Slow, crashy, untested apps come in. Healthy ones leave.</p>
+        <div class="ctas">
+          <button class="btn" id="takeNumber"><i class="ph-bold ph-ticket"></i>Take a number</button>
+          <a class="btn ghost" href="#cases"><i class="ph ph-folder-open"></i>See case files</a>
+        </div>
+        <div class="duty">
+          <img id="avatar" alt="Ahmed Mostafa" width="46" height="46" />
+          <div><b>Ahmed Mostafa</b><small><span class="on">On duty</span> &middot; 4+ years, 15+ apps discharged</small></div>
+        </div>
+      </div>
+
+      <div class="machine" aria-label="Queue ticket machine">
+        <div class="machine-head"><b>Queue</b><span>WAITING ROOM 1</span></div>
+        <div class="screen"><small>YOUR NUMBER</small><div class="num" id="screenNum">---</div><small id="screenMsg">PRESS THE BUTTON</small></div>
+        <button class="btn" style="width:100%;justify-content:center" id="machineBtn"><i class="ph-bold ph-hand-pointing"></i>Print my ticket</button>
+        <div class="slot"></div>
+        <div class="ticket" id="ticket" role="status">
+          <div>DR. AHMED'S APP CLINIC</div>
+          <div class="tn" id="ticketNum">043</div>
+          <div>Estimated wait: <b>0 min</b></div>
+          <div>Dr. Ahmed is suspiciously free.</div>
+          <hr />
+          <a href="#triage">Go to triage &rarr;</a>
+        </div>
+        <div class="machine-spacer" id="spacer"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRIAGE -->
+  <section id="triage">
+    <div class="wrap">
+      <h2>Tell me where it hurts.</h2>
+      <p class="lead">Pick your app's symptoms. Every treatment below is one I've actually done.</p>
+      <div class="triage-grid">
+        <div>
+          <div class="chips" id="chips"></div>
+          <div class="triage-actions">
+            <button class="btn" id="diagnose" disabled><i class="ph-bold ph-stethoscope"></i>Get my diagnosis</button>
+            <small id="pickCount">No symptoms picked. Lucky you.</small>
+          </div>
+        </div>
+        <div class="report" id="report" aria-live="polite">
+          <div class="report-empty"><div><i class="ph ph-clipboard-text"></i>Your diagnosis will appear here.<br/>The doctor is waiting.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history">
+    <div class="wrap">
+      <h2>Medical history.</h2>
+      <p class="lead">The doctor's own chart. Vitals are stable. Coffee intake is not.</p>
+      <div class="chart reveal">
+        <div class="chart-top">
+          <div class="vital"><small>Years in practice</small><strong>4+</strong></div>
+          <div class="vital"><small>Apps discharged</small><strong>15+</strong></div>
+          <div class="vital"><small>Best test coverage</small><strong>80%+</strong></div>
+          <div class="vital"><small>Manual release steps</small><strong>0</strong></div>
+        </div>
+        <svg class="ecg" id="ecg" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 50 H180 L200 50 L215 20 L232 78 L248 8 L262 50 H470 L490 50 L505 22 L522 76 L538 6 L552 50 H760 L780 50 L795 24 L812 74 L828 10 L842 50 H1050 L1070 50 L1085 20 L1102 78 L1118 4 L1132 50 H1200" />
+        </svg>
+        <div class="visits" id="visits"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASES -->
+  <section id="cases">
+    <div class="wrap">
+      <h2>Case files.</h2>
+      <p class="lead">Patients I've treated. All discharged, all still alive in the stores.</p>
+      <div class="cases">
+        <div class="tabs" role="tablist" id="tabs"></div>
+        <article class="folder" id="folder" role="tabpanel"></article>
+      </div>
+      <p class="more" id="more"></p>
+    </div>
+  </section>
+
+  <!-- WALL -->
+  <section id="wall">
+    <div class="wrap">
+      <h2>Certificates on the wall.</h2>
+      <p class="lead">Every clinic has them. Mine are real.</p>
+      <div class="wall" id="certs"></div>
+    </div>
+  </section>
+
+  <!-- PRESCRIPTION -->
+  <section id="rx">
+    <div class="wrap rx-wrap">
+      <div>
+        <h2>Your prescription.</h2>
+        <p class="lead">Classic doctor handwriting. Press translate if you can't read it. Nobody can.</p>
+        <div class="rx-actions">
+          <button class="btn" id="translate"><i class="ph-bold ph-translate"></i>Translate handwriting</button>
+          <button class="btn ghost" id="print"><i class="ph ph-printer"></i>Print it</button>
+        </div>
+        <div class="contact-list">
+          <a id="mailLink"><i class="ph ph-envelope-simple"></i><span id="mailText"></span></a>
+          <a id="liLink" target="_blank" rel="noopener"><i class="ph ph-linkedin-logo"></i>LinkedIn</a>
+          <a id="ghLink" target="_blank" rel="noopener"><i class="ph ph-github-logo"></i>GitHub</a>
+        </div>
+      </div>
+      <div class="rx reveal">
+        <div class="rx-head">
+          <div><b>Ahmed Mostafa</b><small>Senior Flutter Developer &middot; Cairo, Egypt</small><small>Clinic hours: whenever the build is red</small></div>
+          <div class="logo">&#8478;</div>
+        </div>
+        <div class="rx-body">
+          <div class="scrawl" id="scrawl">Hire Ahmd Mstfa, flttr 500mg twce dly, cln archtcture as ndd, tsts 80% aftr mls, rpt untl shppd</div>
+          <div class="clear" id="clear" hidden>
+            <div><b>Take:</b> 1 Ahmed Mostafa, full-time (remote works)</div>
+            <div><b>Contains:</b> Flutter, Dart, Kotlin, Clean Architecture, a bit of NestJS</div>
+            <div><b>Dosage:</b> one feature a sprint, tested and shipped</div>
+            <div><b>Side effects:</b> 80%+ coverage, zero release panic</div>
+            <div><b>Refills:</b> unlimited</div>
+          </div>
+        </div>
+        <div class="rx-foot"><span id="rxDate"></span><span class="sign">A. Mostafa</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Not a real doctor. A real developer, though.</span>
+    <span>&copy; <span id="year"></span> Ahmed Mostafa</span>
+  </div>
+</footer>
+
+<script src="../shared/data.js"></script>
+<script>
+(() => {
+  const A = window.AHMED;
+  const $ = (s) => document.querySelector(s);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const pad = (n) => String(n).padStart(3, "0");
+
+  $("#avatar").src = A.avatar;
+  $("#year").textContent = new Date().getFullYear();
+  $("#rxDate").textContent = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  $("#mailLink").href = A.links.email; $("#mailText").textContent = A.links.emailText;
+  $("#liLink").href = A.links.linkedin; $("#ghLink").href = A.links.github;
+
+  // Announcements
+  const notes = [
+    ["ph-speaker-high", "Please silence your push notifications"],
+    ["ph-flask", "Dr. Ahmed accepts: Flutter, Dart, Kotlin, TypeScript"],
+    ["ph-shield-check", "All patient data is encrypted. Obviously."],
+    ["ph-wifi-slash", "Our other clinic, Mudawy, works without internet"],
+    ["ph-coffee", "Coffee machine is for the doctor only"],
+    ["ph-bug", "Bugs must wait outside"],
+  ];
+  const strip = notes.map(([i, t]) => `<span><i class="ph ${i}"></i>${t}</span>`).join("");
+  $("#announceTrack").innerHTML = strip + strip;
+
+  // Now serving counter
+  let serving = 42;
+  setInterval(() => { serving += 1; $("#nowServing").textContent = pad(serving); }, 7000);
+
+  // Ticket machine
+  let printed = false;
+  function printTicket() {
+    const mine = serving + 1;
+    $("#screenNum").textContent = pad(mine);
+    $("#screenMsg").textContent = "YOU'RE NEXT";
+    $("#ticketNum").textContent = pad(mine);
+    if (!printed) {
+      printed = true;
+      $("#ticket").classList.add("out");
+      $("#spacer").style.height = "10px";
+    }
+  }
+  $("#machineBtn").addEventListener("click", printTicket);
+  $("#takeNumber").addEventListener("click", () => {
+    printTicket();
+    $(".machine").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+
+  // Triage
+  const icons = { tests: "ph-test-tube", spaghetti: "ph-bowl-food", release: "ph-rocket-launch", security: "ph-lock-key-open",
+    offline: "ph-wifi-slash", config: "ph-sliders", team: "ph-users-three", product: "ph-package" };
+  const picked = new Set();
+  $("#chips").innerHTML = A.symptoms.map(s =>
+    `<button class="chip" aria-pressed="false" data-id="${s.id}"><i class="ph ${icons[s.id]}"></i>${s.label}</button>`).join("");
+  $("#chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip"); if (!chip) return;
+    const id = chip.dataset.id;
+    picked.has(id) ? picked.delete(id) : picked.add(id);
+    chip.setAttribute("aria-pressed", picked.has(id));
+    $("#diagnose").disabled = picked.size === 0;
+    $("#pickCount").textContent = picked.size === 0 ? "No symptoms picked. Lucky you."
+      : picked.size === 1 ? "1 symptom. Probably fine." : `${picked.size} symptoms. Hmm.`;
+  });
+  function severity(n) {
+    if (n <= 2) return ["Mild", "One appointment should do it."];
+    if (n <= 5) return ["Serious", "We're going to need a sprint."];
+    return ["Critical", "Hire full-time. Immediately."];
+  }
+  $("#diagnose").addEventListener("click", () => {
+    const list = A.symptoms.filter(s => picked.has(s.id));
+    const [level, advice] = severity(list.length);
+    $("#report").innerHTML = `
+      <div class="report-head"><h3>Diagnosis</h3><span class="sev">${level}</span></div>
+      ${list.map((s, i) => `
+        <div class="dx" style="animation-delay:${i * 90}ms">
+          <i class="ph-duotone ph-pill"></i>
+          <div><s>${s.label}</s><b>${s.cure}</b><p>${s.proof}</p></div>
+        </div>`).join("")}
+      <div class="triage-actions"><a class="btn" href="#rx"><i class="ph-bold ph-prescription"></i>Get prescription</a><small>${advice}</small></div>`;
+    if (innerWidth < 900) $("#report").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  });
+
+  // History
+  const notesByCompany = { Iden2: "Patient now 80% tested. Remarkable.", Mudawy: "Opened his own clinic. Literally.", Nuwas: "Led the ward. 4 devs, 0 casualties." };
+  $("#visits").innerHTML = A.experience.map(x => `
+    <div class="visit">
+      <div class="when">${x.period}<br/>${x.where}</div>
+      <div>
+        <h3>${x.role} <span>@ ${x.company}</span></h3>
+        <ul>${x.wins.map(w => `<li><i class="ph-bold ph-check"></i>${w}</li>`).join("")}</ul>
+        ${notesByCompany[x.company] ? `<div class="note">${notesByCompany[x.company]}</div>` : ""}
+      </div>
+    </div>`).join("");
+
+  // Cases
+  const status = { mudawy: "MY CLINIC", eowl: "AWARDED" };
+  function openCase(id) {
+    const p = A.projects.find(x => x.id === id);
+    document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id === id));
+    const f = $("#folder");
+    f.classList.remove("swap"); void f.offsetWidth; f.classList.add("swap");
+    f.innerHTML = `
+      <div class="stamp">${status[id] || "DISCHARGED"}</div>
+      <h3>${p.name}</h3>
+      <p class="tagline">${p.oneLiner}</p>
+      <div class="fields">
+        <div class="field"><small>COMPLAINT</small><p>${p.problem}</p></div>
+        <div class="field"><small>TREATMENT</small><p>${p.fix}</p></div>
+      </div>
+      <div class="meds">${p.stack.map(s => `<span>${s}</span>`).join("")}</div>
+      ${p.link ? `<a class="btn ghost visit-link" href="${p.link}" target="_blank" rel="noopener"><i class="ph ph-arrow-up-right"></i>Visit ${p.name}</a>` : ""}`;
+  }
+  $("#tabs").innerHTML = A.projects.map(p =>
+    `<button class="tab" role="tab" data-id="${p.id}" aria-selected="false">${p.name}<small>${p.tag}</small></button>`).join("");
+  $("#tabs").addEventListener("click", (e) => { const t = e.target.closest(".tab"); if (t) openCase(t.dataset.id); });
+  openCase("mudawy");
+  $("#more").textContent = `Also treated: ${A.moreApps.join(", ")}.`;
+
+  // Certificates
+  const certIcons = ["ph-globe-hemisphere-east", "ph-trophy", "ph-medal", "ph-rocket"];
+  const tilts = ["-2deg", "2.5deg", "-1.5deg", "1.8deg"];
+  $("#certs").innerHTML = A.achievements.map((a, i) => `
+    <div class="cert reveal" style="--tilt:${tilts[i]}">
+      <div><i class="ph-duotone ${certIcons[i]}"></i><strong>${a.title}</strong><small>${a.by}</small>
+      ${i === 0 ? `<div class="sig">with the E-Owl app</div>` : ""}</div>
+    </div>`).join("");
+
+  // Prescription translate (text scramble)
+  let translated = false;
+  $("#translate").addEventListener("click", () => {
+    translated = !translated;
+    const scrawl = $("#scrawl"), clear = $("#clear");
+    $("#translate").innerHTML = translated ? '<i class="ph-bold ph-pen-nib"></i>Back to doctor mode' : '<i class="ph-bold ph-translate"></i>Translate handwriting';
+    if (!translated) { clear.hidden = true; scrawl.hidden = false; return; }
+    scrawl.hidden = true; clear.hidden = false;
+    if (reduce) return;
+    const glyphs = "abcdefghijklmnopqrstuvwxyz%#@&";
+    clear.querySelectorAll("div").forEach((line, li) => {
+      const label = line.querySelector("b").outerHTML;
+      const target = line.textContent.replace(line.querySelector("b").textContent, "");
+      let frame = 0;
+      const total = 18 + li * 4;
+      const tick = () => {
+        frame++;
+        const done = Math.floor((frame / total) * target.length);
+        const text = target.split("").map((c, i) => i < done || c === " " ? c : glyphs[Math.floor(Math.random() * glyphs.length)]).join("");
+        line.innerHTML = label + text;
+        if (frame < total) setTimeout(tick, 40); else line.innerHTML = label + target;
+      };
+      tick();
+    });
+  });
+  $("#print").addEventListener("click", () => window.print());
+
+  // Reveal on scroll + ECG draw
+  const io = new IntersectionObserver((entries) => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add(e.target.id === "ecg" ? "go" : "in");
+    io.unobserve(e.target);
+  }), { threshold: 0, rootMargin: "0px 0px -8% 0px" });
+  document.querySelectorAll(".reveal, #ecg").forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>

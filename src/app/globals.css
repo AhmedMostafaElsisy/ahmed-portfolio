@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* ---------- Neutral tokens (light / dark) ---------- */
+:root {
+  --bg: #f3f3f0;
+  --surface: #ffffff;
+  --surface-2: #ebebe7;
+  --ink: #131313;
+  --muted: #5b5b57;
+  --line: #dadad4;
+  --shadow: 0 30px 60px -30px rgb(20 20 20 / 0.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0b0d;
+    --surface: #151518;
+    --surface-2: #1e1e22;
+    --ink: #ededea;
+    --muted: #9d9d98;
+    --line: #2a2a2f;
+    --shadow: 0 30px 60px -30px rgb(0 0 0 / 0.8);
+  }
+}
+
+/* ---------- Palettes ----------
+   --accent: fills (buttons, highlights)   --accent-ink: text on accent
+   --accent-text: accent-colored text that stays readable on --bg
+   --wall-*: phone wallpaper */
+[data-palette="lime"] {
+  --accent: #c6f432; --accent-ink: #12160a; --accent-text: #4a6600;
+  --wall-a: #c6f432; --wall-b: #1f3a2a; --wall-c: #0b1220;
+}
+[data-palette="cobalt"] {
+  --accent: #2f54ff; --accent-ink: #ffffff; --accent-text: #2442e0;
+  --wall-a: #5b7bff; --wall-b: #1a2a8f; --wall-c: #070b24;
+}
+[data-palette="mint"] {
+  --accent: #2fd4a7; --accent-ink: #05271d; --accent-text: #0a7d5e;
+  --wall-a: #2fd4a7; --wall-b: #1c3b35; --wall-c: #0e1214;
+}
+[data-palette="rose"] {
+  --accent: #ff3d71; --accent-ink: #ffffff; --accent-text: #d0144d;
+  --wall-a: #ff6b8f; --wall-b: #7a1636; --wall-c: #140509;
+}
+[data-palette="sunset"] {
+  --accent: #ff5a1f; --accent-ink: #ffffff; --accent-text: #d4410b;
+  --wall-a: #ff8a4c; --wall-b: #b5300a; --wall-c: #120604;
+}
+@media (prefers-color-scheme: dark) {
+  [data-palette="lime"] { --accent-text: #c6f432; }
+  [data-palette="cobalt"] { --accent-text: #8ea2ff; }
+  [data-palette="mint"] { --accent-text: #2fd4a7; }
+  [data-palette="rose"] { --accent-text: #ff7a9c; }
+  [data-palette="sunset"] { --accent-text: #ff8a4c; }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-text: var(--accent-text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s;
+}
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.wallpaper {
+  background:
+    radial-gradient(120% 70% at 15% 5%, color-mix(in srgb, var(--wall-a) 85%, transparent) 0%, transparent 55%),
+    radial-gradient(90% 60% at 95% 95%, color-mix(in srgb, var(--wall-a) 45%, transparent) 0%, transparent 60%),
+    linear-gradient(165deg, var(--wall-b), var(--wall-c) 70%);
+}
+.glass {
+  background: rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: rgb(30 30 34 / 0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

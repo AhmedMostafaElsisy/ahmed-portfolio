@@ -57,7 +57,7 @@ export const about = [
 export const jobs: readonly Job[] = [
   {
     id: "iden2",
-    role: "Senior Flutter Developer",
+    role: "Mobile Engineer",
     company: "Iden2",
     where: "Remote",
     period: "Jun 2025 - Now",
